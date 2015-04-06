@@ -12,7 +12,9 @@ class FirmataTest {
 
     public function run() {
         while(true) {
-            trace(arduino.analogRead(0));
+            var reading = arduino.analogRead(0);
+            trace(reading);
+            arduino.analogWrite(9, reading >> 2);
             Sys.sleep(0.04);
         }
     }
