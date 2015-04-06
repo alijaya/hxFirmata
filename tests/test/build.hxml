@@ -1,0 +1,5 @@
+-lib hxSerial
+-cp ../../
+-cp Source
+-main FirmataTest
+-neko Export/FirmataTest.n
