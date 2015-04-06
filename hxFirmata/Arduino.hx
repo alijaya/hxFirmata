@@ -12,52 +12,52 @@ class Arduino {
     /**
      * Constant to set a pin to input mode (in a call to pinMode()).
      */
-    public static inline var INPUT : Int = 0;
+    public static inline var INPUT : UInt = 0;
     /**
      * Constant to set a pin to output mode (in a call to pinMode()).
      */
-    public static inline var OUTPUT : Int = 1;
+    public static inline var OUTPUT : UInt = 1;
     /**
      * Constant to set a pin to analog mode (in a call to pinMode()).
      */
-    public static inline var ANALOG : Int = 2;
+    public static inline var ANALOG : UInt = 2;
     /**
      * Constant to set a pin to PWM mode (in a call to pinMode()).
      */
-    public static inline var PWM : Int = 3;
+    public static inline var PWM : UInt = 3;
     /**
      * Constant to set a pin to servo mode (in a call to pinMode()).
      */
-    public static inline var SERVO : Int = 4;
+    public static inline var SERVO : UInt = 4;
     /**
      * Constant to set a pin to shiftIn/shiftOut mode (in a call to pinMode()).
      */
-    public static inline var SHIFT : Int = 5;
+    public static inline var SHIFT : UInt = 5;
     /**
      * Constant to set a pin to I2C mode (in a call to pinMode()).
      */
-    public static inline var I2C : Int = 6;
+    public static inline var I2C : UInt = 6;
 
     /**
      * Constant to write a high value (+5 volts) to a pin (in a call to
      * digitalWrite()).
      */
-    public static inline var LOW : Int = 0;
+    public static inline var LOW : UInt = 0;
     /**
      * Constant to write a low value (0 volts) to a pin (in a call to
      * digitalWrite()).
      */
-    public static inline var HIGH : Int = 1;
+    public static inline var HIGH : UInt = 1;
 
     public static function list() : Array<String> {
         return Serial.getDeviceList();
     }
 
-    var serial : Serial;
+    public var serial : Serial;
     var firmata : Firmata;
     var thread : Thread;
 
-    public function new(iname : String, irate : Int = 57600) {
+    public function new(iname : String, irate : UInt = 57600) {
         firmata = new Firmata(write);
         serial = new Serial(iname, irate, true);
 
@@ -69,14 +69,15 @@ class Arduino {
         thread = Thread.create(processInput);
     }
 
-    function write(val : Int) : Void {
-        serial.writeByte(val);
+    function write(val : UInt) : Void {
+        serial.writeByte(val & 0xFF);
     }
 
     function processInput() : Void {
         while(true) {
             while(serial.available() > 0) {
-                firmata.processInput(serial.readByte());
+                var byte = serial.readByte();
+                firmata.processInput(byte & 0xFF);
             }
         }
     }
@@ -91,7 +92,7 @@ class Arduino {
      * @param pin the digital pin whose value should be returned (from 2 to 13,
      * since pins 0 and 1 are used for serial communication)
      */
-    public function digitalRead(pin : Int) : Int {
+    public function digitalRead(pin : UInt) : UInt {
         return firmata.digitalRead(pin);
     }
     
@@ -101,7 +102,7 @@ class Arduino {
      *
      * @param pin the analog pin whose value should be returned (from 0 to 5)
      */
-    public function analogRead(pin : Int) : Int {
+    public function analogRead(pin : UInt) : UInt {
         return firmata.analogRead(pin);
     }
     
@@ -111,7 +112,7 @@ class Arduino {
      * @param pin the pin whose mode to set (from 2 to 13)
      * @param mode either Arduino.INPUT or Arduino.OUTPUT
      */
-    public function pinMode(pin : Int, mode : Int) : Void {
+    public function pinMode(pin : UInt, mode : UInt) : Void {
         try {
             firmata.pinMode(pin, mode);
         } catch (e : Dynamic) {
@@ -127,7 +128,7 @@ class Arduino {
      * @param value the value to write: Arduino.LOW (0 volts) or Arduino.HIGH
      * (5 volts)
      */
-    public function digitalWrite(pin : Int, value : Int) : Void {
+    public function digitalWrite(pin : UInt, value : UInt) : Void {
         try {
             firmata.digitalWrite(pin, value);
         } catch (e : Dynamic) {
@@ -143,7 +144,7 @@ class Arduino {
      * @param value the value: 0 being the lowest (always off), and 255 the highest
      * (always on)
      */
-    public function analogWrite(pin : Int, value : Int) : Void {
+    public function analogWrite(pin : UInt, value : UInt) : Void {
         try {
             firmata.analogWrite(pin, value);
         } catch (e : Dynamic) {
@@ -157,7 +158,7 @@ class Arduino {
      * @param pin the pin the servo is attached to
      * @param value the value: 0 being the lowest angle, and 180 the highest angle
      */
-    public function servoWrite(pin : Int, value : Int) : Void {
+    public function servoWrite(pin : UInt, value : UInt) : Void {
         try {
             firmata.servoWrite(pin, value);
         } catch (e : Dynamic) {
